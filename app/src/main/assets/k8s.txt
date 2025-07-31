@@ -1,0 +1,114 @@
+kubectl get po,查看当前命名空间所有 Pod 列表
+
+kubectl get po -A,查看所有命名空间所有 Pod 列表
+
+kubectl get po -o wide,查看 Pod 详细信息 (含 IP, 节点, 镜像)
+
+kubectl describe po <pod-name>,深入诊断指定 Pod 详细信息 (含事件、状态)
+
+kubectl delete po <pod-name>,删除指定 Pod
+
+kubectl logs <pod-name>,查看 Pod 容器日志 (默认第一个容器)
+
+kubectl logs <pod-name> -c <container-name>,查看指定 Pod 中指定容器日志
+
+kubectl exec -it <pod-name> -- bash,进入 Pod 容器交互式 Shell
+kubectl apply -f <file-path>,根据 YAML 文件部署/更新资源 (强烈推荐，生产环境主力！)
+
+kubectl delete -f <file-path>,删除 YAML 文件中定义的所有资源
+
+kubectl scale --replicas=<num> deploy/<deploy-name>,调整 Deployment 副本数量 (扩缩容)
+
+kubectl set image deploy/<deploy-name> <container-name>=<image-name>:<image-tag>,快速更新 Deployment 容器镜像 (简单场景用)
+
+kubectl rollout history deploy/<deploy-name>,查看 Deployment 部署历史
+
+kubectl rollout undo deploy/<deploy-name> --to-revision=<revision-number>,回滚 Deployment 到指定历史版本
+kubectl edit cm <configmap-name>,在线编辑 ConfigMap
+
+kubectl port-forward po/<pod-name> <local-port>:<target-port>,将本地端口转发到 Pod 端口 (本地调试神器！)
+
+kubectl top po,显示 Pod 资源 (CPU/内存) 使用情况
+
+kubectl top nodes,显示 Node 节点资源 (CPU/内存) 使用情况
+
+kubectl explain <resource-type>.<field-path>,显示 K8s 资源字段的详细解释 (例如 kubectl explain pod.spec.containers.image)
+apiVersion,定义 K8s API 版本 (如 apps/v1, v1)
+
+kind,定义 K8s 资源类型 (如 Deployment, Service, Pod)
+
+metadata.name,资源的唯一名称
+
+metadata.namespace,资源所属的命名空间
+
+metadata.labels,资源的标签 (键值对，用于选择器匹配和资源分组，如 app: nginx)
+
+metadata.annotations,资源的注释 (键值对，存储非识别性信息)
+spec.replicas,Deployment 期望运行的 Pod 副本数量
+
+spec.selector.matchLabels,Deployment 用来选择它管理的 Pod 的标签
+
+spec.template.metadata.labels,Pod 模板的标签 (会被 spec.selector 匹配)
+
+spec.template.spec.containers[],Pod 内容器的定义列表
+
+name,容器名称
+
+image,容器镜像 (如 nginx:latest)
+
+ports[].containerPort,容器内部监听的端口
+
+env[],容器环境变量
+
+resources.requests.cpu / memory,容器请求的 CPU/内存
+
+resources.limits.cpu / memory,容器限制的 CPU/内存
+
+volumeMounts[],容器挂载的卷定义
+
+name,挂载的卷名称
+
+mountPath,卷在容器内的挂载路径
+
+livenessProbe,存活探针 (判断容器是否活着，不健康重启)
+
+readinessProbe,就绪探针 (判断容器是否准备好接收流量)
+
+spec.template.spec.volumes[],Pod 定义的存储卷列表 (如 emptyDir, configMap, secret, persistentVolumeClaim)
+
+name,存储卷名称
+
+configMap.name,引用ConfigMap的名称
+
+secret.secretName,引用Secret的名称
+spec.selector,Service 用来选择它要暴露的 Pod 的标签
+
+spec.ports[],Service 端口定义列表
+
+port,Service 对外暴露的端口
+
+targetPort,流量转发到后端 Pod 内部监听的端口
+
+spec.type,Service 的服务类型 (ClusterIP, NodePort, LoadBalancer)
+spec.ingressClassName,指定使用的 Ingress Controller 类型 (如 nginx)
+
+spec.rules[],Ingress 路由规则列表
+
+host,Ingress 匹配的域名
+
+http.paths[],HTTP 路径匹配规则
+
+path,URL 路径 (如 /api)
+
+backend.service.name,后端 Service 名称 (Ingress 路由目标)
+
+backend.service.port.number,后端 Service 端口 (Ingress 路由目标)
+
+spec.tls[],HTTPS/TLS 配置 (用于启用HTTPS)
+
+secretName,存储TLS证书和私钥的 Secret 名称
+data.<key>,ConfigMap 中键值对形式的配置数据
+
+stringData.<key>,Secret 中以字符串形式定义的秘密数据 (K8s 会自动 Base64 编码)
+
+type,Secret 的类型 (如 Opaque, kubernetes.io/tls)

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">随身听</string>
+    
+    <!-- Navigation -->
+    <string name="nav_library">词库</string>
+    <string name="nav_player">随身听</string>
+    <string name="nav_review">复习</string>
+    <string name="select_groups">选择分组</string>
+    
+    <!-- Library Screen -->
+    <string name="library_title">词库管理</string>
+    <string name="library_import">导入词库</string>
+    <string name="library_import_builtin">导入内置词库</string>
+    <string name="library_activate">激活</string>
+    <string name="library_delete">删除</string>
+    <string name="library_delete_confirm">确定要删除这个词库吗？</string>
+    <string name="library_delete_success">词库删除成功</string>
+    <string name="library_delete_failed">词库删除失败</string>
+    <string name="library_import_success">词库导入成功</string>
+    <string name="library_import_failed">词库导入失败</string>
+    <string name="library_import_builtin_success">内置词库导入成功</string>
+    <string name="library_import_builtin_failed">内置词库导入失败</string>
+    <string name="library_no_active">未选择词库</string>
+    <string name="library_select_first">请先选择一个词库</string>
+    <string name="active">已激活</string>
+    <string name="word_count">%d个单词</string>
+    <string name="activate_library">激活词库</string>
+    <string name="delete_library">删除词库</string>
+    <string name="import_library">导入词库</string>
+    <string name="library_name">词库名称</string>
+    
+    <!-- Player Screen -->
+    <string name="player_title">随身听</string>
+    <string name="player_no_words">当前词库没有单词</string>
+    <string name="no_library">没有可用的词库</string>
+    <string name="no_words">没有单词</string>
+    <string name="player_meaning_show">显示释义</string>
+    <string name="player_meaning_hide">隐藏释义</string>
+    <string name="player_settings">播放设置</string>
+    <string name="player_settings_mode">播放模式</string>
+    <string name="player_settings_speed">播放速度</string>
+    <string name="player_settings_interval">播放间隔</string>
+    <string name="player_settings_random">随机播放</string>
+    <string name="player_settings_loop">循环播放</string>
+    <string name="player_settings_word_repeat">单词重复</string>
+    <string name="player_settings_word_repeat_summary">单词重复次数: %d</string>
+    <string name="no_words_in_group">当前分组没有单词</string>
+    
+    <!-- Playback Modes -->
+    <string name="playback_mode_hide_all">隐藏所有</string>
+    <string name="playback_mode_cn_only">仅中文</string>
+    <string name="playback_mode_word_only">仅单词</string>
+    <string name="playback_mode_word_to_cn">单词 → 中文</string>
+    
+    <!-- Brush Modes -->
+    <string name="brush_mode_normal">普通模式</string>
+    <string name="brush_mode_blind">默念模式</string>
+    <string name="brush_mode_recall">回想模式</string>
+    
+    <!-- Group Management -->
+    <string name="group_all">全部单词</string>
+    <string name="group_select">选择分组</string>
+    <string name="group_selected">已选择 %d 个分组</string>
+    <string name="group">第%d组</string>
+    <string name="words_count">%d个单词</string>
+    <string name="listened">已听</string>
+    <string name="reviewed">已复习</string>
+    
+    <!-- Error Messages -->
+    <string name="error_no_tts">设备不支持TTS功能</string>
+    <string name="error_tts_init_failed">TTS初始化失败</string>
+    <string name="error_tts_language_not_supported">TTS不支持当前语言</string>
+    <string name="error_tts_speak_failed">TTS朗读失败</string>
+    <string name="error_permission_required">需要存储权限来导入词库</string>
+    <string name="error_file_read_failed">文件读取失败</string>
+    <string name="error_invalid_file_format">文件格式不正确</string>
+    
+    <!-- Common -->
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="ok">好的</string>
+    <string name="close">关闭</string>
+    <string name="delete">删除</string>
+    <string name="edit">编辑</string>
+    <string name="save">保存</string>
+    <string name="add">添加</string>
+    <string name="remove">移除</string>
+    <string name="select_all">全选</string>
+    <string name="deselect_all">取消全选</string>
+    <string name="search_hint">搜索单词或释义...</string>
+    <string name="no_search_results">没有找到匹配的单词</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+
+</resources>
