@@ -8,7 +8,7 @@ class FormatUtils {
 		// ===== 颜色定义 =====
 		// 统一词性颜色为天蓝色
 		private val POS_COLOR = Color(0xFF87CEEB) // 天蓝色
-		private val WORD_COLOR = Color(0xFF2E8B57) // 墨绿色
+		val WORD_COLOR = Color(0xFF2E8B57) // 墨绿色
 		
 		/**
 		 * 将英语或日语词性标记转换为中文显示形式
@@ -34,8 +34,38 @@ class FormatUtils {
 				
 				// === 英/法常见缩写及性别标记 ===
 				// 处理法语n.f./n.m.格式
-				pos == "n.f." -> "阴.名词"
-				pos == "n.m." -> "阳.名词"
+				// 基础性别标记
+				pos == "n.f." || pos == "f.f." -> "阴.名词"
+				pos == "n.m." || pos == "m.m." -> "阳.名词"
+				pos == "n." -> "名词"
+				pos == "e.adj." -> "形容词"
+				// 处理更灵活的词性格式
+				pos.startsWith("n.") -> {
+					when {
+						pos.contains(".f.") -> "阴.名词"
+						pos.contains(".m.") -> "阳.名词"
+						else -> "名词"
+					}
+				}
+				pos.startsWith("v.") -> {
+					when {
+						pos.contains(".t.") || pos.contains("transitif") -> "及物动词"
+						pos.contains(".i.") || pos.contains("intransitif") -> "不及物动词"
+						pos.contains(".pr.") -> "代动词"
+						pos.contains(".impers.") -> "无人称动词"
+						pos.contains(".aux.") -> "助动词"
+						pos.contains(".mod.") -> "情态动词"
+						else -> "动词"
+					}
+				}
+				pos.startsWith("adj.") -> {
+					when {
+						pos.contains(".f.") -> "阴.形容词"
+						pos.contains(".m.") -> "阳.形容词"
+						pos.contains(".inv.") -> "不变形容词"
+						else -> "形容词"
+					}
+				}
 				// 处理常见法语词性缩写
 				pos == "adv." || pos == "adverbe" -> "副词"
 				pos == "adj." || pos == "adjectif" -> "形容词"
@@ -53,6 +83,7 @@ class FormatUtils {
 				pos == "v.impers." || pos == "verbe impersonnel" -> "无人称动词"
 				pos == "v.aux." || pos == "verbe auxiliaire" -> "助动词"
 				pos == "v.mod." || pos == "verbe modal" -> "情态动词"
+				// 增强法语名词阴阳性处理
 				pos.startsWith("n.") -> {
 					when {
 						pos.contains("f") || pos.contains("féminin") || pos.contains("fem") || pos.contains("féminine") -> "阴.名词"
@@ -60,6 +91,11 @@ class FormatUtils {
 						else -> "名词"
 					}
 				}
+				// 处理法语复合词性标记
+				pos.contains("nom") && pos.contains("masculin") -> "阳.名词"
+				pos.contains("nom") && pos.contains("féminin") -> "阴.名词"
+				pos.contains("adjectif") && pos.contains("masculin") -> "阳.形容词"
+				pos.contains("adjectif") && pos.contains("féminin") -> "阴.形容词"
 				pos.startsWith("v.") -> { // 动词细分
 					when {
 						pos.contains("t") || pos.contains("transitif") || pos.contains("transitive") -> "及物动词"

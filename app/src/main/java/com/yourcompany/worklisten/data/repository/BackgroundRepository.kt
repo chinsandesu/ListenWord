@@ -74,13 +74,18 @@ class BackgroundRepository(private val context: Context) {
 				}
 				BitmapFactory.decodeFile(file.absolutePath, options)
 				
-				// 计算缩放比例（根据屏幕尺寸优化）
-				val scaleFactor = calculateInSampleSize(options, 1080, 1920) // 最大1080p
+				// 使用固定分辨率2560x1440，避免设备屏幕尺寸获取问题
+				val maxWidth = 2560
+				val maxHeight = 1440
+				
+				// 计算缩放比例
+				val scaleFactor = calculateInSampleSize(options, maxWidth, maxHeight)
 				
 				// 解码并缩放图片
 				val decodeOptions = BitmapFactory.Options().apply {
 					inSampleSize = scaleFactor
 					inPreferredConfig = Bitmap.Config.ARGB_8888 // 支持透明通道
+					// 移除可能导致问题的配置
 				}
 				BitmapFactory.decodeFile(file.absolutePath, decodeOptions)
 			} else {
@@ -144,12 +149,13 @@ class BackgroundRepository(private val context: Context) {
 	
 	/**
 	 * 计算图片缩放比例
+	 * 恢复为原始实现，确保兼容性
 	 */
 	private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
 		val height = options.outHeight
 		val width = options.outWidth
 		var inSampleSize = 1
-		
+	
 		if (height > reqHeight || width > reqWidth) {
 			val halfHeight = height / 2
 			val halfWidth = width / 2

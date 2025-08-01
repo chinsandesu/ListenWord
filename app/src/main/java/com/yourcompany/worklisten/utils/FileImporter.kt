@@ -80,9 +80,21 @@ class FileImporter(private val context: Context) {
 					// 对于 TXT，我们直接将整行作为需要 WordParser.parseColumns 处理的 "parts"
 					// 如果一行中包含逗号，它会被 split，然后由 WordParser 智能处理
 					val parts = trimmedLine.split(",").map { it.trim() }
-					
-					// 调用 WordParser 的新方法来解析列
-					val parsedData = WordParser.parseColumns(parts)
+				
+				// 安全检查：确保parts至少有2个元素
+				if (parts.size < 2) {
+					Log.w(TAG, "跳过列数不足的TXT行: $trimmedLine")
+					return@forEach
+				}
+
+				// 安全检查：确保parts至少有2个非空元素
+				val nonEmptyPartsCount = parts.count { it.isNotBlank() }
+				if (nonEmptyPartsCount < 2) {
+					Log.w(TAG, "跳过有效列数不足的TXT行: ${parts.joinToString(",")}")
+					return@forEach
+				}
+
+				val parsedData = WordParser.parseColumns(parts)
 					
 					if (parsedData.word.isNotBlank() && parsedData.meaning.isNotBlank()) {
 						parsedWords.add(ParsedWord(
@@ -146,6 +158,10 @@ class FileImporter(private val context: Context) {
 			
 			rows.forEach { row ->
 				val parts = row.map { it.trim() } // 确保每个部分都被trim
+				if (parts.size < 2) {
+					Log.w(TAG, "跳过列数不足的CSV行: ${row.joinToString(delimiter.toString())}")
+					return@forEach
+				}
 				val parsedData = WordParser.parseColumns(parts)
 				
 				if (parsedData.word.isNotBlank() && parsedData.meaning.isNotBlank()) {
@@ -209,6 +225,12 @@ class FileImporter(private val context: Context) {
 				}
 				// 如果实际列数少于4，WordParser.parseColumns 会根据实际传入的part.size处理
 				
+				// 安全检查：确保parts至少有2个非空元素
+				val nonEmptyPartsCount = parts.count { it.isNotBlank() }
+				if (nonEmptyPartsCount < 2) {
+				
+				}
+
 				val parsedData = WordParser.parseColumns(parts)
 				
 				if (parsedData.word.isNotBlank() && parsedData.meaning.isNotBlank()) {

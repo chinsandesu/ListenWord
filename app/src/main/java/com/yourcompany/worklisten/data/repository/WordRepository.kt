@@ -135,6 +135,20 @@ class WordRepository(private val database: AppDatabase, private val fileImporter
     suspend fun activateLibrary(libraryId: Long) {
         wordLibraryDao.activateLibrary(libraryId)
         playbackProgressDao.updateActiveLibrary(libraryId)
+
+        // 检查是否有选中的组，如果没有则默认选择第一组
+        val selectedGroups = getSelectedGroups()
+        if (selectedGroups.isEmpty()) {
+            // 获取该词库的所有组
+            val groups = getGroupsForLibraryOnce(libraryId)
+            if (groups.isNotEmpty()) {
+                // 默认选择第一组
+                val firstGroup = groups.minByOrNull { it.groupId } ?: groups[0]
+                saveSelectedGroups(listOf(firstGroup.groupId))
+                // 更新组的选择状态
+                updateGroupsSelected(listOf(firstGroup.id), true)
+            }
+        }
     }
     
     /**
@@ -160,7 +174,7 @@ class WordRepository(private val database: AppDatabase, private val fileImporter
      * 处理导入结果并保存到数据库
      */
     suspend fun importLibraryFromResult(importResult: FileImporter.ImportResult.Success): Long {
-        android.util.Log.d("WordRepository", "Importing library: ${importResult.library.name} with ${importResult.words.size} words")
+        // 导入词库: ${importResult.library.name}，共 ${importResult.words.size} 个单词
         // 1. 插入词库并获取ID
         val libraryId = wordLibraryDao.insertLibrary(importResult.library)
         
@@ -185,7 +199,7 @@ class WordRepository(private val database: AppDatabase, private val fileImporter
         wordDao.insertWords(words)
         wordGroupDao.insertGroups(groups)
         
-        android.util.Log.d("WordRepository", "Library imported successfully with ID: $libraryId")
+        // 词库导入成功，ID: $libraryId
         return libraryId
     }
 
@@ -388,7 +402,7 @@ class WordRepository(private val database: AppDatabase, private val fileImporter
      * 更新单词重复次数
      */
     suspend fun updateWordRepeatCount(count: Int) {
-		android.util.Log.d("WordRepository", "Updating word repeat count in database to: $count")
+		// 更新单词重复次数到数据库: $count
 		playbackProgressDao.updateWordRepeatCount(count)
 	}
     

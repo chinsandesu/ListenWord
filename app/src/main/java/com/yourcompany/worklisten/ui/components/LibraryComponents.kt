@@ -51,7 +51,10 @@ fun LibraryCard(
             .fillMaxWidth()
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        )
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -190,4 +193,4 @@ fun ImportResultDialog(
         },
         onDismissRequest = onDismiss
     )
-} 
+}

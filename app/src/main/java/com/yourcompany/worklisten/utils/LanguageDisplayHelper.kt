@@ -26,15 +26,14 @@ object LanguageDisplayHelper {
 		val partOfSpeech = FormatUtils.getChinesePartOfSpeech(word.wordType)
 		val posColor = FormatUtils.getColorForPartOfSpeech(word.wordType)
 		val wordColor = FormatUtils.getWordColor()
-		
+
 		return buildAnnotatedString {
 			when (displayMode) {
 				ReviewDisplayMode.SHOW_ALL -> {
+					// 第一部分：单词
 					when {
 						word.isJapanese && word.originalWord?.isNotBlank() == true -> {
-							// 日语有汉字：3层显示
-							// 第一行：汉字和假名（同一行显示，确保居中对齐）
-							// 日语有汉字：上下分层显示，确保居中对齐
+							// 日语有汉字：显示汉字和假名
 							withStyle(
 								style = SpanStyle(
 									color = wordColor,
@@ -42,29 +41,8 @@ object LanguageDisplayHelper {
 								)
 							) {
 								append(word.originalWord)
-									}
-									append("\n") // 汉字和假名之间添加换行符
-									withStyle(
-										style = SpanStyle(
-											color = wordColor,
-											fontWeight = FontWeight.Bold
-										)
-									) {
-										append(word.word)
-									}
-									append("\n") // 假名和词性之间添加换行符
-									// 显示词性和意思
-									if (partOfSpeech.isNotBlank()) {
-										withStyle(style = SpanStyle(color = posColor)) {
-											append(partOfSpeech)
-										}
-										append("  ") // 词性和意思之间用两个空格分隔
-									}
-									append("${word.meaning}")
-						}
-						
-						else -> { // 日语无汉字/其他语言
-							// 第一行：单词本体 (word.word)
+							}
+							append("\n") // 汉字和假名之间添加换行符
 							withStyle(
 								style = SpanStyle(
 									color = wordColor,
@@ -72,82 +50,110 @@ object LanguageDisplayHelper {
 								)
 							) {
 								append(word.word)
-									}
-									// 减少空行，直接显示词性和意思
-									if (partOfSpeech.isNotBlank()) {
-										append("\n")
-										withStyle(style = SpanStyle(color = posColor)) {
-											append(partOfSpeech)
-										}
-										append("  ") // 词性和意思之间用两个空格分隔
-									}
-									append("${word.meaning}")
+							}
+						} else ->{
+							// 其他语言或无汉字的日语：显示单词本体
+							withStyle(
+								style = SpanStyle(
+									color = wordColor,
+									fontWeight = FontWeight.Bold
+								)
+							) {
+								append(word.word)
+							}
 						}
 					}
-				}
-				
-				ReviewDisplayMode.HIDE_WORD -> {
-					// 只显示词性、意思
+
+					// 第二部分：词性+意思
+					append("\n") // 单词和词性之间添加换行符
 					if (partOfSpeech.isNotBlank()) {
 						withStyle(style = SpanStyle(color = posColor)) {
 							append(partOfSpeech)
 						}
-						append("  ") // 词性和意思之间用两个空格分隔
-						append("${word.meaning}")
+						append("  ") // 词性和意思之间添加两个空格
+					}
+					if (word.meaning.isNotBlank()) {
+						append(word.meaning)
+					} else {
+						append("无释义")
 					}
 				}
-				
+
+				ReviewDisplayMode.HIDE_WORD -> {
+					// 第一部分：词性+意思
+					if (partOfSpeech.isNotBlank()) {
+						withStyle(style = SpanStyle(color = posColor)) {
+							append(partOfSpeech)
+						}
+						append(" ") // 词性和意思之间添加空格
+					}
+					if (word.meaning.isNotBlank()) {
+						append(word.meaning)
+					} else {
+						append("无释义")
+					}
+				}
+
 				ReviewDisplayMode.HIDE_MEANING -> {
-						// 只显示单词、词性
-						when {
-							word.isJapanese && word.originalWord?.isNotBlank() == true -> {
-								// 日语有汉字：显示汉字和假名（同一行显示，确保居中对齐）
-								// 日语有汉字：上下分层显示，确保居中对齐
-								withStyle(
-									style = SpanStyle(
-										color = wordColor,
-										fontWeight = FontWeight.Bold
-									)
-								) {
-									append(word.originalWord)
-								}
-								append("\n") // 汉字和假名之间添加换行符
-								withStyle(
-									style = SpanStyle(
-										color = wordColor,
-										fontWeight = FontWeight.Bold
-									)
-								) {
-									append(word.word)
-								}
+					// 第一部分：单词
+					when {
+						word.isJapanese && word.originalWord?.isNotBlank() == true -> {
+							// 日语有汉字：显示汉字和假名
+							withStyle(
+								style = SpanStyle(
+									color = wordColor,
+									fontWeight = FontWeight.Bold
+								)
+							) {
+								append(word.originalWord)
 							}
-							
-							else -> {
-								// 日语无汉字/其他语言：显示单词本体
-								withStyle(
-									style = SpanStyle(
-										color = wordColor,
-										fontWeight = FontWeight.Bold
-									)
-								) {
-									append(word.word)
-								}
+							append("\n") // 汉字和假名之间添加换行符
+							withStyle(
+								style = SpanStyle(
+									color = wordColor,
+									fontWeight = FontWeight.Bold
+								)
+							) {
+								append(word.word)
 							}
 						}
-						if (partOfSpeech.isNotBlank()) {
-							append(" ") // 单词和词性之间一个空格
-							withStyle(style = SpanStyle(color = posColor)) {
-								append("[$partOfSpeech]")
+						else -> {
+							// 其他语言：显示单词本体
+							withStyle(
+								style = SpanStyle(
+									color = wordColor,
+									fontWeight = FontWeight.Bold
+								)
+							) {
+								append(word.word)
 							}
+						}
+					}
+
+					// 第二部分：词性（仅当有词性时显示）
+					if (partOfSpeech.isNotBlank()) {
+						append("\n") // 单词和词性之间添加换行符
+						withStyle(style = SpanStyle(color = posColor)) {
+							append(partOfSpeech)
 						}
 					}
 				}
 			}
 		}
-
+	}
+		
 		/**
 		 * 计算字体大小，根据内容长度动态调整
 		 */
+		// 添加空行以保持代码结构一致
+		
+		// 修复：确保在HIDE_MEANING模式下不显示单词意思
+		// 修改内容：
+		// 1. 在HIDE_MEANING模式下，单词和词性之间添加换行符，使显示更清晰
+		// 2. 移除了词性外的方括号，保持与其他模式一致的显示风格
+		// 3. 确保在任何情况下都不会访问word.meaning
+		// 4. 修复了HIDE_WORD模式下的逻辑，确保即使partOfSpeech为空也能显示意思
+
 		fun calculateFontSize(baseSize: Int, contentLength: Int, maxReduction: Int = 4): Int {
 			val effectiveLength = contentLength * 2 
 			val reduction = min(effectiveLength / 20 * 2, maxReduction)
@@ -168,9 +174,9 @@ object LanguageDisplayHelper {
 		 */
 		fun getTextStyleInfo(word: Word, isReviewMode: Boolean = true): TextStyleInfo {
 		    // 基础字体大小设置
-		    val baseMainSize = if (isReviewMode) 34 else 38  // 刷词模式减小4sp
-		    val baseSubSize = if (isReviewMode) 12 else 20    // 刷词模式减小4sp，随身听模式增大4sp
-		    val baseMeaningSize = if (isReviewMode) 14 else 18 // 刷词模式减小4sp
+		    val baseMainSize = if (isReviewMode) 28 else 38  // 刷词模式减小10sp(原34-6)
+		    val baseSubSize = if (isReviewMode) 8 else 20    // 刷词模式减小12sp(原12-4)
+		    val baseMeaningSize = if (isReviewMode) 10 else 18 // 刷词模式减小8sp(原14-4)
 		
 		    return TextStyleInfo(
 		        isCentered = true,

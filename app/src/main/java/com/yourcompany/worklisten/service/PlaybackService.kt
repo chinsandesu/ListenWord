@@ -8,8 +8,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import javax.inject.Provider
 import androidx.core.app.NotificationCompat
 import com.yourcompany.worklisten.R
+import com.yourcompany.worklisten.data.local.AppDatabase
 import com.yourcompany.worklisten.data.repository.SettingsRepository
 import com.yourcompany.worklisten.data.repository.WordRepository
 import com.yourcompany.worklisten.utils.FileImporter
@@ -41,10 +43,25 @@ class PlaybackService : Service() {
         settingsRepository = SettingsRepository(this)
         ttsHelper = TtsHelper(this, settingsRepository)
         fileImporter = FileImporter(this)
-        // 注意：WordRepository的初始化可能需要数据库实例，这里简化处理，实际应用中可能需要Dagger/Hilt注入
-        // 或者通过Application类提供
-        // wordRepository = WordRepository(AppDatabase.getDatabase(this, serviceScope), fileImporter)
-        // 暂时不初始化wordRepository，因为当前服务主要用于保持TTS运行，如果需要播放逻辑，则需要完整初始化
+        // 使用延迟初始化的Provider解决循环依赖
+        val repositoryProvider = object : Provider<WordRepository> {
+            private var repository: WordRepository? = null
+
+            fun setRepository(repo: WordRepository) {
+                repository = repo
+            }
+
+            override fun get(): WordRepository {
+                return repository ?: throw IllegalStateException("WordRepository not initialized yet")
+            }
+        }
+
+        // 初始化数据库
+        val database = AppDatabase.getDatabase(this, serviceScope, repositoryProvider)
+        // 初始化仓库
+        wordRepository = WordRepository(database, fileImporter)
+        // 设置仓库到Provider
+        repositoryProvider.setRepository(wordRepository)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

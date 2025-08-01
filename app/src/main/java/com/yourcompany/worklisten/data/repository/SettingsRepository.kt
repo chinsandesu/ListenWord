@@ -58,9 +58,10 @@ class SettingsRepository(private val context: Context) {
 		return prefs.getString("background_file", null)
 	}
 	
-	fun clearBackgroundSetting() {
+	suspend fun clearBackgroundSetting() {
 		prefs.edit().remove("background_file").apply()
 		_backgroundFileName.value = null
+		saveBackgroundImageUri(null)
 	}
 
     // 单词重复朗读次数相关

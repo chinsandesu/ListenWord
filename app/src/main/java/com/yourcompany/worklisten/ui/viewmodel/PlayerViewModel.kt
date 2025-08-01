@@ -291,6 +291,18 @@ class PlayerViewModel(
 			val fileName = backgroundRepository.saveBackground(uri)
 			fileName?.let {
 				settingsRepository.saveBackgroundFileName(it)
+				// 立即更新UI状态，触发重新加载
+				_uiState.update { it.copy(backgroundImagePath = null) }
+				// 等待文件保存完成和文件系统更新
+				delay(500)
+				// 再次更新UI状态，确保获取最新的文件路径
+				backgroundRepository.observeBackgroundFiles().firstOrNull()?.let { files ->
+					val bgImagePath = files.find { file -> file.name == it }?.absolutePath
+					android.util.Log.d("BackgroundUpdate", "Updating background image path: $bgImagePath")
+					_uiState.update {
+						it.copy(backgroundImagePath = bgImagePath)
+					}
+				}
 			}
 		}
 	}
@@ -301,6 +313,14 @@ class PlayerViewModel(
 				backgroundRepository.deleteBackground(it)
 			}
 			settingsRepository.clearBackgroundSetting()
+			
+			// 立即更新UI状态，触发默认背景显示
+			_uiState.update { it.copy(backgroundImagePath = null) }
+			// 等待文件删除完成
+			delay(500)
+			// 再次更新UI状态，确保清除生效
+			android.util.Log.d("BackgroundUpdate", "Removing background image")
+			_uiState.update { it.copy(backgroundImagePath = null) }
 		}
 	}
 	

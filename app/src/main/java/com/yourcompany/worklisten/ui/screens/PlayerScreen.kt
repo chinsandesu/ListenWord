@@ -27,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.style.TextAlign
 
 import coil.compose.AsyncImage
 import com.yourcompany.worklisten.R
@@ -98,6 +99,7 @@ fun PlayerScreen(
 	}
 	
 	Scaffold(
+		containerColor = Color.Transparent,
 		topBar = {
 			TopSearchBar(
 				title = "随身听",
@@ -108,120 +110,82 @@ fun PlayerScreen(
 				}
 			)
 		}
-	) { paddingValues ->
-	
-		
+	) {
 		Box(
 			modifier = Modifier
 				.fillMaxSize()
-				.padding(paddingValues)
+				.padding(it)
 		) {
-		Box(
-			modifier = Modifier
-				.fillMaxSize()
-				.padding(paddingValues)
-		) {
-			Column(
-				modifier = Modifier
-					.fillMaxSize()
-					.padding(paddingValues)
+			// 移除了重复的Box和背景图片显示逻辑
+			
+			// 主内容区域
+			Box(
+				modifier = Modifier.fillMaxSize(),
+				contentAlignment = Alignment.Center
 			) {
-				Column(
-					modifier = Modifier
-						.fillMaxSize()
-						.padding(paddingValues)
-				) {
-					
-					
-					// 背景图片显示
-					Box(modifier = Modifier.fillMaxSize()) {
-						uiState.backgroundImagePath?.let { imagePath ->
-							AsyncImage(
-								model = imagePath,
-								contentDescription = "Background Image",
-								modifier = Modifier.fillMaxSize(),
-								contentScale = ContentScale.Crop
-							)
-							// 半透明覆盖层，提升文字可读性
-							Box(
-								modifier = Modifier
-									.fillMaxSize()
-									.background(Color(0xFFF5F5DC).copy(alpha = 0.7f))
-							)
-						}
-						// 主内容区域
-						Box(
+				when {
+					uiState.isLoading -> LoadingIndicator()
+					!uiState.hasWords -> EmptyState(message = stringResource(R.string.no_words_in_group))
+					else -> {
+						Column(
 							modifier = Modifier.fillMaxSize(),
-							contentAlignment = Alignment.Center
+							horizontalAlignment = Alignment.CenterHorizontally,
+							verticalArrangement = Arrangement.Center
 						) {
-							when {
-								uiState.isLoading -> LoadingIndicator()
-								!uiState.hasWords -> EmptyState(message = stringResource(R.string.no_words_in_group))
-								else -> {
-									Column(
-										modifier = Modifier.fillMaxSize(),
-										horizontalAlignment = Alignment.CenterHorizontally,
-										verticalArrangement = Arrangement.Center
-									) {
-										key(uiState.currentWord?.id) {
-											WordDisplayCard(
-												word = uiState.currentWord,
-												playbackMode = uiState.playbackMode,
-												onCardClicked = { viewModel.onCardClicked() }
-											)
-										}
-										Spacer(modifier = Modifier.height(32.dp))
-										PlayerControls(
-											isPlaying = uiState.isPlaying,
-											onPlayPause = { viewModel.togglePlayPause() },
-											onNext = { viewModel.nextWord() },
-											onPrevious = { viewModel.previousWord() },
-											onSettings = { showSheet = true }
-										)
-									}
-								}
+							key(uiState.currentWord?.id) {
+								WordDisplayCard(
+									word = uiState.currentWord,
+									playbackMode = uiState.playbackMode,
+									onCardClicked = { viewModel.onCardClicked() }
+								)
 							}
-						}
-						// 设置底部弹窗
-						if (showSheet) {
-							PlayerSettingsSheet(
-								sheetState = sheetState,
-								playbackMode = uiState.playbackMode,
-								isRandom = uiState.isRandom,
-								isLoop = uiState.isLoop,
-								playbackSpeed = uiState.playbackSpeed,
-								playbackInterval = uiState.playbackInterval,
-								wordRepeatCount = uiState.wordRepeatCount,
-								onDismiss = {
-									scope.launch {
-										sheetState.hide()
-										showSheet = false
-									}
-								},
-								onModeChange = viewModel::setPlaybackMode,
-								onRandomToggle = viewModel::toggleRandomMode,
-								onLoopToggle = viewModel::toggleLoopMode,
-								onSpeedChange = viewModel::setPlaybackSpeed,
-								onIntervalChange = viewModel::setPlaybackInterval,
-								onWordRepeatCountChange = viewModel::setWordRepeatCount,
-								onLaunchImagePicker = { imagePickerLauncher.launch(arrayOf("image/*")) },
-								onRemoveBackgroundImage = {
-									viewModel.removeBackgroundImage()
-									scope.launch {
-										sheetState.hide()
-										showSheet = false
-									}
-								}
+							Spacer(modifier = Modifier.height(32.dp))
+							PlayerControls(
+								isPlaying = uiState.isPlaying,
+								onPlayPause = { viewModel.togglePlayPause() },
+								onNext = { viewModel.nextWord() },
+								onPrevious = { viewModel.previousWord() },
+								onSettings = { showSheet = true }
 							)
 						}
 					}
 				}
 			}
+			// 设置底部弹窗
+			if (showSheet) {
+				PlayerSettingsSheet(
+					sheetState = sheetState,
+					playbackMode = uiState.playbackMode,
+					isRandom = uiState.isRandom,
+					isLoop = uiState.isLoop,
+					playbackSpeed = uiState.playbackSpeed,
+					playbackInterval = uiState.playbackInterval,
+					wordRepeatCount = uiState.wordRepeatCount,
+					onDismiss = {
+						scope.launch {
+							sheetState.hide()
+							showSheet = false
+						}
+					},
+					onModeChange = viewModel::setPlaybackMode,
+					onRandomToggle = viewModel::toggleRandomMode,
+					onLoopToggle = viewModel::toggleLoopMode,
+					onSpeedChange = viewModel::setPlaybackSpeed,
+					onIntervalChange = viewModel::setPlaybackInterval,
+					onWordRepeatCountChange = viewModel::setWordRepeatCount,
+					onLaunchImagePicker = { imagePickerLauncher.launch(arrayOf("image/*")) },
+					onRemoveBackgroundImage = {
+						viewModel.removeBackgroundImage()
+						scope.launch {
+							sheetState.hide()
+							showSheet = false
+						}
+					}
+				)
+			}
 		}
 	}
 }
-}
-
 
 @Composable
 fun WordDisplayCard(
@@ -236,7 +200,7 @@ fun WordDisplayCard(
 			.defaultMinSize(minHeight = 300.dp)
 			.padding(16.dp)
 			.background(
-				MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+				MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), // 降低透明度到0.4以减少对背景的遮挡
 				RoundedCornerShape(16.dp)
 			)
 			.clickable(onClick = onCardClicked)
@@ -249,6 +213,7 @@ fun WordDisplayCard(
 			
 			Column(
 				verticalArrangement = Arrangement.Center,
+				horizontalAlignment = Alignment.CenterHorizontally,
 				modifier = Modifier.padding(16.dp)
 			) {
 				// 单词区域
@@ -267,21 +232,26 @@ fun WordDisplayCard(
 						word.word
 					}
 					Text(
-						text = wordToDisplay,
-						style = MaterialTheme.typography.displayMedium.copy(
-							fontSize = textStyleInfo.mainTextSize.sp,
-							fontWeight = FontWeight.Bold
-						)
-					)
+					text = wordToDisplay,
+					style = MaterialTheme.typography.displayMedium.copy(
+						fontSize = textStyleInfo.mainTextSize.sp,
+						fontWeight = FontWeight.Bold,
+						color = FormatUtils.WORD_COLOR
+					),
+					textAlign = TextAlign.Center,
+					modifier = Modifier.fillMaxWidth()
+				)
 					
 					word.wordType?.let {
 						Text(
-							text = FormatUtils.PartOfSpeechHelper.getChinesePartOfSpeech(it),
-							style = MaterialTheme.typography.titleMedium.copy(
-								fontSize = textStyleInfo.subTextSize.sp,
-								color = FormatUtils.getColorForPartOfSpeech(it)
-							)
-						)
+						text = FormatUtils.PartOfSpeechHelper.getChinesePartOfSpeech(it),
+						style = MaterialTheme.typography.titleMedium.copy(
+							fontSize = (textStyleInfo.subTextSize + 4).sp,
+							color = FormatUtils.getColorForPartOfSpeech(it)
+						),
+						textAlign = TextAlign.Center,
+						modifier = Modifier.fillMaxWidth()
+					)
 					}
 				}
 				
@@ -293,13 +263,14 @@ fun WordDisplayCard(
 						Spacer(modifier = Modifier.height(16.dp))
 					}
 					Text(
-						text = word.meaning,
-						style = MaterialTheme.typography.titleLarge.copy(
-							fontSize = textStyleInfo.meaningTextSize.sp,
-							color = MaterialTheme.colorScheme.onSurface
-						),
-						modifier = Modifier.padding(vertical = 4.dp)
-					)
+					text = word.meaning,
+					style = MaterialTheme.typography.titleLarge.copy(
+						fontSize = (textStyleInfo.meaningTextSize + 4).sp,
+						color = MaterialTheme.colorScheme.onSurface
+					),
+					textAlign = TextAlign.Center,
+					modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth()
+				)
 				}
 			}
 		}

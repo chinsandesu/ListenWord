@@ -55,22 +55,8 @@ fun ReviewScreen(
     val uiState by viewModel.uiState.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 背景图片显示，与随身听一致
-        uiState.backgroundImagePath?.let { imagePath ->
-            AsyncImage(
-                model = imagePath,
-                contentDescription = "Background Image",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-            // 半透明覆盖层，提升文字可读性
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFFF5F5DC).copy(alpha = 0.7f))
-            )
-        }
-
+        // 移除了自己实现的背景图片显示逻辑
+        
         when {
             uiState.isLoading -> {
                 LoadingIndicator()
@@ -155,8 +141,8 @@ private fun ReviewContent(
                 .fillMaxSize()
                 .padding(top = 8.dp, bottom = 16.dp)
         ) {
-            items(pagingItems.itemCount) { index ->
-                val word = pagingItems[index]
+            items(pagingItems.itemCount) {
+                val word = pagingItems[it]
                 word?.let {
                     ReviewWordCard(
                         word = it,
@@ -187,7 +173,7 @@ fun ReviewWordCard(
                 .defaultMinSize(minHeight = 100.dp) // 缩小卡片高度
                 .padding(horizontal = 12.dp, vertical = 4.dp) // 减小卡片边距
                 .background(
-                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f), // 降低透明度到0.4以减少对背景的遮挡
                     RoundedCornerShape(12.dp)
                 )
                 .clickable { onSpeak(word) }

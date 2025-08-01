@@ -34,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.yourcompany.worklisten.data.local.model.WordChapter
 import com.yourcompany.worklisten.ui.components.EmptyState
@@ -50,6 +51,7 @@ fun GroupScreen(viewModel: GroupViewModel) {
     val lazyListState = rememberLazyListState()
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             Column(
                 modifier = Modifier
