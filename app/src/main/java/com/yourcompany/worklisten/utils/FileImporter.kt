@@ -308,7 +308,7 @@ class FileImporter(private val context: Context) {
 				isJapanese = isJapanese,
 				language = language
 			)
-			Log.d(TAG, "Adding word: ${word.word}, meaning: ${word.meaning}, type: ${word.wordType}, isJapanese: ${word.isJapanese}, language: ${word.language}")
+		
 			words.add(word)
 			wordCount++
 			currentGroupWordCount++

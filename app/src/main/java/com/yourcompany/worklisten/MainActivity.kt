@@ -1,6 +1,8 @@
 package com.yourcompany.worklisten
 
 import android.os.Bundle
+import android.content.res.Configuration
+import android.content.pm.ActivityInfo
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.yourcompany.worklisten.data.local.AppDatabase
@@ -20,6 +22,14 @@ import com.yourcompany.worklisten.service.PlaybackService
 
 class MainActivity : ComponentActivity() {
 
+    /**
+     * 检测当前设备是否为平板
+     * @return 如果是平板则返回true，否则返回false
+     */
+    private fun isTablet(): Boolean {
+        return resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE
+    }
+
     private lateinit var ttsHelper: TtsHelper
     private lateinit var wordRepository: WordRepository
     private lateinit var settingsRepository: SettingsRepository
@@ -28,6 +38,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // 根据设备类型设置屏幕方向
+        if (isTablet()) {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        } else {
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
 
         // 初始化工具类
         fileImporter = FileImporter(this)
